@@ -1,0 +1,36 @@
+/* src/index.css */
+
+/* Reset dasar agar font mengikuti standar sistem operasi yang enak dibaca */
+body {
+  background-color: #f4f6f9; /* Warna abu-abu sangat muda, standar dashboard modern */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  /* Kita HAPUS display: flex dan place-items: center bawaan Vite */
+}
+
+/* Membuat Card terlihat lebih pop-up dan tidak kaku (borderless) */
+.card {
+  border: none !important; /* Paksa hilang border bawaan bootstrap */
+  border-radius: 12px !important;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Bayangan halus */
+}
+
+/* Memberi bayangan tipis pada Navbar supaya terpisah dari konten */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  background-color: white;
+}
+
+/* Membuat tombol sedikit membulat agar lebih modern */
+.btn {
+  border-radius: 8px !important;
+  font-weight: 500;
+  padding: 8px 16px;
+}
+
+/* Tweak tambahan untuk SweetAlert2 agar fontnya sinkron */
+div:where(.swal2-container) {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
