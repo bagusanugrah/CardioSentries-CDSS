@@ -112,6 +112,13 @@ const AdminDashboard = () => {
   const filteredDoctors = doctors.filter(doc => 
     doc.nip.toLowerCase().includes(searchNip.toLowerCase()) ||
     doc.name.toLowerCase().includes(searchNip.toLowerCase())
+  )
+  .sort((a, b) => a.nip.localeCompare(b.nip, undefined, { numeric: true }));
+
+  // --- TAMBAHAN BARU DI SINI ---
+  // Urutkan Record Pasien dari yang Paling Baru (Descending)
+  const sortedRecords = [...allRecords].sort((a, b) => 
+    new Date(b.updatedAt) - new Date(a.updatedAt)
   );
 
   return (
@@ -262,7 +269,7 @@ const AdminDashboard = () => {
                  </tr>
                </thead>
                <tbody>
-                 {allRecords.map((rec) => (
+                 {sortedRecords.map((rec) => (
                    <tr key={rec.id}>
                      <td>{rec.patient_number}</td>
                      <td className="fw-bold">{rec.patient_name}</td>
@@ -276,7 +283,7 @@ const AdminDashboard = () => {
                      <td className="small text-muted">{new Date(rec.updatedAt).toLocaleString()}</td>
                    </tr>
                  ))}
-                 {allRecords.length === 0 && <tr><td colSpan="6" className="text-center py-4 text-muted">Belum ada data.</td></tr>}
+                 {sortedRecords.length === 0 && <tr><td colSpan="6" className="text-center py-4 text-muted">Belum ada data.</td></tr>}
                </tbody>
              </Table>
           </Card>
