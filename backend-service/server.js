@@ -126,15 +126,19 @@ app.post('/api/doctor/predict', verifyToken, async (req, res) => {
     try {
         // 1. Kirim data medis ke Python AI Service
         const aiResponse = await axios.post(process.env.AI_SERVICE_URL, medical_data);
-        const { result_text, probability } = aiResponse.data;
+        
+        // --- PERBAIKAN DI SINI ---
+        // Python mengirim key "probability_percent", bukan "probability"
+        const result_text = aiResponse.data.result_text;
+        const probability = aiResponse.data.probability_percent; // <--- INI KUNCINYA
 
         // 2. Simpan hasil ke Database Node.js
         const newRecord = await PatientRecord.create({
             patient_number,
             patient_name,
-            medical_data, // Disimpan sebagai JSON string otomatis
+            medical_data, 
             prediction_result: result_text,
-            probability,
+            probability: probability, // Simpan nilai yang benar
             doctor_nip: req.user.nip
         });
 
