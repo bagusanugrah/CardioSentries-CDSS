@@ -1,7 +1,3 @@
-Silakan Copy (klik tombol copy di pojok kanan atas kotak ini) lalu Paste langsung ke file .md.
-
-Markdown
-
 <div align="center">
 
   <h1>🛠️ Installation & Setup Guide</h1>
