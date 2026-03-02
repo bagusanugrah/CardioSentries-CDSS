@@ -4,6 +4,8 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FaPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
 
+const API_BASE_URL = import.meta.env.BACKEND_API_BASE_URL;
+
 const DoctorDashboard = () => {
   const [records, setRecords] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -24,7 +26,7 @@ const DoctorDashboard = () => {
   // Fetch Data Pasien
   const fetchRecords = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/api/doctor/records', { headers });
+      const res = await axios.get(`${API_BASE_URL}/api/doctor/records`, { headers });
       setRecords(res.data);
     } catch (err) {
       console.error(err);
@@ -78,10 +80,10 @@ const DoctorDashboard = () => {
       let res;
       if (isEdit) {
         // Mode Edit
-        res = await axios.put(`http://localhost:3000/api/doctor/records/${editId}`, { medical_data }, { headers });
+        res = await axios.put(`${API_BASE_URL}/api/doctor/records/${editId}`, { medical_data }, { headers });
       } else {
         // Mode Baru
-        res = await axios.post('http://localhost:3000/api/doctor/predict', payload, { headers });
+        res = await axios.post(`${API_BASE_URL}/api/doctor/predict`, payload, { headers });
       }
 
       const result = res.data.data.prediction_result;
@@ -135,7 +137,7 @@ const DoctorDashboard = () => {
     });
 
     if (confirm.isConfirmed) {
-      await axios.delete(`http://localhost:3000/api/doctor/records/${id}`, { headers });
+      await axios.delete(`${API_BASE_URL}/api/doctor/records/${id}`, { headers });
       fetchRecords();
       Swal.fire('Terhapus!', '', 'success');
     }

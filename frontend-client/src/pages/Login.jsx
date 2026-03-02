@@ -4,6 +4,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaUserMd } from 'react-icons/fa';
 
+const API_BASE_URL = import.meta.env.BACKEND_API_BASE_URL;
+
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -13,7 +15,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:3000/api/auth/login', { username, password });
+      const res = await axios.post(`${API_BASE_URL}/api/auth/login`, { username, password });
       
       // Simpan sesi
       localStorage.setItem('token', res.data.token);

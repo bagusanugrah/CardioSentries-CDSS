@@ -4,6 +4,8 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FaUserPlus, FaSearch, FaEye, FaEyeSlash, FaUserMd, FaNotesMedical, FaEdit, FaTrash, FaSave, FaTimes } from 'react-icons/fa';
 
+const API_BASE_URL = import.meta.env.BACKEND_API_BASE_URL;
+
 const AdminDashboard = () => {
   // State Data
   const [doctors, setDoctors] = useState([]);
@@ -27,8 +29,8 @@ const AdminDashboard = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const resDocs = await axios.get('http://localhost:3000/api/admin/doctors', { headers });
-      const resRecs = await axios.get('http://localhost:3000/api/admin/all-records', { headers });
+      const resDocs = await axios.get(`${API_BASE_URL}/api/admin/doctors`, { headers });
+      const resRecs = await axios.get(`${API_BASE_URL}/api/admin/all-records`, { headers });
       setDoctors(resDocs.data);
       setAllRecords(resRecs.data);
     } catch (err) {
@@ -49,11 +51,11 @@ const AdminDashboard = () => {
     try {
       if (isEdit) {
         // Mode UPDATE
-        await axios.put(`http://localhost:3000/api/admin/doctors/${editId}`, formData, { headers });
+        await axios.put(`${API_BASE_URL}/api/admin/doctors/${editId}`, formData, { headers });
         Swal.fire('Terupdate!', 'Data dokter berhasil diperbarui.', 'success');
       } else {
         // Mode CREATE
-        await axios.post('http://localhost:3000/api/admin/doctors', formData, { headers });
+        await axios.post(`${API_BASE_URL}/api/admin/doctors`, formData, { headers });
         Swal.fire('Sukses', 'Dokter baru berhasil didaftarkan.', 'success');
       }
       
@@ -87,7 +89,7 @@ const AdminDashboard = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`http://localhost:3000/api/admin/doctors/${id}`, { headers });
+        await axios.delete(`${API_BASE_URL}/api/admin/doctors/${id}`, { headers });
         Swal.fire('Terhapus!', 'Data dokter telah dihapus.', 'success');
         fetchData();
         if (isEdit && editId === id) resetForm(); // Reset form jika sedang edit user yang dihapus
