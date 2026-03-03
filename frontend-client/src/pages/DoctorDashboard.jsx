@@ -4,7 +4,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FaPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
 
-const API_BASE_URL = import.meta.env.BACKEND_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const DoctorDashboard = () => {
   const [records, setRecords] = useState([]);
