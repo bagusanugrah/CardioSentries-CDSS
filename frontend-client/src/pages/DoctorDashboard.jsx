@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Table, Button, Badge, Modal, Form, Row, Col, Card } from 'react-bootstrap';
+import { Table, Button, Badge, Modal, Form, Row, Col, Card, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import { FaPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaSearch, FaPrint, FaDownload, FaClock } from 'react-icons/fa';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -11,7 +11,8 @@ const DoctorDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editId, setEditId] = useState(null);
-  
+  const [printHistory, setPrintHistory] = useState(null);
+
   // State Form Input (Sesuai parameter API)
   const [formData, setFormData] = useState({
     patient_number: '', patient_name: '',
@@ -33,7 +34,17 @@ const DoctorDashboard = () => {
     }
   };
 
-  useEffect(() => { fetchRecords(); }, []);
+  // Fetch riwayat print terakhir
+  const fetchPrintHistory = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/api/doctor/print-history`, { headers });
+      setPrintHistory(res.data.history);
+    } catch (err) {
+      console.error('Gagal ambil history:', err);
+    }
+  };
+
+  useEffect(() => { fetchRecords(); fetchPrintHistory(); }, []);
 
   // Handle Input Change
   const handleChange = (e) => {
@@ -143,6 +154,69 @@ const DoctorDashboard = () => {
     }
   };
 
+  // Bantu tambahkan token ke URL (hanya untuk mode dev)
+  // Mode production: URL bucket GCS sudah jadi public, buka langsung tanpa token
+  const buildOpenUrl = (mode, url) => {
+    if (mode === 'production') return url;
+    // dev: URL relatif — gabung dengan API base + sertakan token via query
+    const sep = url.includes('?') ? '&' : '?';
+    return `${API_BASE_URL}${url}${sep}token=${encodeURIComponent(token)}`;
+  };
+
+  // Handler Print PDF
+  const handlePrintPdf = async () => {
+    Swal.fire({
+      title: 'Membuat PDF...',
+      text: 'Sedang menyiapkan rekapan pasien',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
+
+    try {
+      const res = await axios.get(`${API_BASE_URL}/api/doctor/records/pdf`, { headers });
+      const { mode, count } = res.data;
+
+      const dl = await axios.get(`${API_BASE_URL}/api/doctor/records/pdf/download`, { headers });
+      const fullUrl = buildOpenUrl(dl.data.mode, dl.data.downloadUrl);
+
+      window.open(fullUrl, '_blank');
+
+      await fetchPrintHistory();
+
+      Swal.fire({
+        icon: 'success',
+        title: 'PDF Siap',
+        text: `${count} data pasien diexport (mode: ${mode})`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error(err);
+      const msg = err.response?.data?.msg || 'Gagal membuat PDF';
+      Swal.fire('Error', msg, 'error');
+    }
+  };
+
+  // Handler Download Ulang dari riwayat
+  const handleDownloadExisting = async () => {
+    try {
+      const dl = await axios.get(`${API_BASE_URL}/api/doctor/records/pdf/download`, { headers });
+      const fullUrl = buildOpenUrl(dl.data.mode, dl.data.downloadUrl);
+      window.open(fullUrl, '_blank');
+    } catch (err) {
+      console.error(err);
+      const msg = err.response?.data?.msg || 'Gagal mendownload PDF';
+      Swal.fire('Error', msg, 'error');
+    }
+  };
+
+  const formatDateTime = (iso) => {
+    if (!iso) return '-';
+    return new Date(iso).toLocaleString('id-ID', {
+      dateStyle: 'long', timeStyle: 'short'
+    });
+  };
+
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -150,10 +224,46 @@ const DoctorDashboard = () => {
           <h2 className="fw-bold mb-1">Dashboard Klinis</h2>
           <p className="text-muted">Kelola data pasien dan lakukan prediksi risiko jantung.</p>
         </div>
-        <Button variant="primary" onClick={() => { resetForm(); setShowModal(true); }}>
-          <FaPlus className="me-2" /> Pasien Baru
-        </Button>
+        <div className="d-flex gap-2">
+          <Button variant="outline-primary" onClick={handlePrintPdf}>
+            <FaPrint className="me-2" /> Print PDF
+          </Button>
+          <Button variant="primary" onClick={() => { resetForm(); setShowModal(true); }}>
+            <FaPlus className="me-2" /> Pasien Baru
+          </Button>
+        </div>
       </div>
+
+      {/* --- RIWAYAT PRINT PDF --- */}
+      <Card className="mb-3 border-0 shadow-sm">
+        <Card.Body className="d-flex flex-wrap align-items-center justify-content-between gap-2 py-3">
+          <div className="d-flex align-items-center gap-3">
+            <div className="bg-light rounded-circle d-flex align-items-center justify-content-center" style={{ width: 44, height: 44 }}>
+              <FaClock className="text-primary" />
+            </div>
+            <div>
+              <div className="fw-semibold mb-0">Riwayat Print PDF</div>
+              {printHistory ? (
+                <small className="text-muted">
+                  Terakhir di-print: <strong>{formatDateTime(printHistory.last_printed_at)}</strong>
+                  {' '}• Mode: <span className="badge bg-secondary">{printHistory.mode}</span>
+                </small>
+              ) : (
+                <small className="text-muted">Belum pernah print. Klik "Print PDF" untuk membuat rekapan.</small>
+              )}
+            </div>
+          </div>
+          <Button
+            variant={printHistory ? 'outline-primary' : 'secondary'}
+            size="sm"
+            disabled={!printHistory}
+            onClick={handleDownloadExisting}
+          >
+            <FaDownload className="me-2" />
+            Download Ulang
+          </Button>
+        </Card.Body>
+      </Card>
 
       <Card className="p-0 overflow-hidden">
         <Table hover responsive className="mb-0 align-middle">
