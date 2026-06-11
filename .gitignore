@@ -1,0 +1,29 @@
+# Env files (contain secrets)
+.env
+.env.local
+.env.production
+gcp-service-account.json
+
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+
+# Build
+dist/
+*.pdf
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Storage
+backend-service/storage/
+
+# Logs
+*.log
