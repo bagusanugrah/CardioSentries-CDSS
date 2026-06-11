@@ -1,9 +1,9 @@
 <div align="center">
 
-  <h1>🛠️ Installation & Setup Guide</h1>
+  <h1>🛠️ CardioSentries CDSS</h1>
   
   <p>
-    <b>Panduan Lengkap Deployment Sistem CardioSentries (Localhost)</b>
+    <b>Clinical Decision Support System untuk Deteksi Risiko Penyakit Jantung Koroner</b>
   </p>
 
   <p>
@@ -15,6 +15,19 @@
   
   <br />
 </div>
+
+---
+
+> ## 📚 DOKUMENTASI PENTING
+>
+> Sebelum melanjutkan, mohon baca dokumentasi berikut:
+>
+> | # | Dokumen | Deskripsi |
+> |---|---------|-----------|
+> | 1 | **[📘 API_DOCUMENTATION.md](./API_DOCUMENTATION.md)** | Dokumentasi lengkap seluruh REST API endpoint (Auth, Admin, Doctor, Public, PDF) |
+> | 2 | **[🤖 AI_DOCUMENTATION.md](./AI_DOCUMENTATION.md)** | Dokumentasi lengkap modul AI/ML (Dataset, Pipeline, Model, Performance, Feature Glossary, Inference) |
+>
+> **⬇️ Installer / Setup Guide ada di bawah. Untuk pengguna yang ingin meng-*integrasikan* atau *memahami* sistem, klik kedua link di atas terlebih dahulu.**
 
 ---
 
