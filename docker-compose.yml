@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: cardio-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_DATABASE: cardio_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+
+  backend:
+    build: ./backend-service
+    container_name: cardio-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend-service/.env
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASS: root1234
+      DB_NAME: cardio_db
+      AI_SERVICE_URL: http://ai-service:8000/predict
+      APP_MODE: dev
+    depends_on:
+      - db
+      - ai-service
+    networks:
+      - app-network
+
+  ai-service:
+    build: ./ai-service
+    container_name: cardio-ai
+    restart: always
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend-client
+    container_name: cardio-frontend
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db_data:
